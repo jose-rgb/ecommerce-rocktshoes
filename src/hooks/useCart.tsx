@@ -52,7 +52,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
           //adicionar os que ja tinham mais o novo desestruturado
           setCart([...cart, {...product, amount: 1}]);
           //adicionar no localstorage
-          localStorage.setItem('@RocketShoes:cart', JSON.stringify([...cart, {...product}]));
+          localStorage.setItem('@RocketShoes:cart', JSON.stringify([...cart, {...product, amount: 1}]));
           toast('Produto adicionado')
           return;
         }
@@ -86,9 +86,22 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
   const removeProduct = (productId: number) => {
     try {
-      // TODO
+      //verificar se produto existe no carrinho 
+      const productExists = cart.some(cartProduct => cartProduct.id === productId);
+
+      //se n existir
+      if(!productExists) {
+        toast.error('Erro na remoção do produto');
+        return;
+      }
+
+      //se existir, retornar todos os products que tem id diferente do id repassado para remover
+      const updatedCart = cart.filter(cartItem => cartItem.id !== productId);
+      setCart(updatedCart);
+      localStorage.setItem('@RocketShoes:cart', JSON.stringify(updatedCart));
+
     } catch {
-      // TODO
+      toast.error('Erro na remoção do produto');
     }
   };
 
@@ -97,9 +110,43 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     amount,
   }: UpdateProductAmount) => {
     try {
-      // TODO
+      if(amount < 1) {
+        toast.error('Erro na alteração de quantidade do produto')
+        return;
+      }
+
+       //buscar produto no stock por id
+       const response = await api.get(`/stock/${productId}`);
+       const productAmount = response.data.amount;
+       //se n tem em estoque a quantidade solicitada
+       const stockIsNotAvailable = amount > productAmount;
+
+       if(stockIsNotAvailable) {
+         toast.error('Quantidade solicitada fora do estoque');
+         return;
+       }
+
+       //se existe
+       const productExists = cart.some(cartProduct => cartProduct.id === productId);
+
+       //se n existir
+       if(!productExists) {
+         toast.error('Erro na alteração de quantidade do produto');
+         return;
+       }
+
+       //repassando o novo amount, se id n for igual devolver o cartItem sem alteração
+       const updateCart = cart.map(cartItem => cartItem.id === productId ? {
+         ...cartItem,
+         amount: amount,
+       }: cartItem)
+
+       //salvando cart
+       setCart(updateCart);
+       //salvando no localstorage
+       localStorage.setItem('@RocketShoes:cart', JSON.stringify(updateCart));
     } catch {
-      // TODO
+      toast.error('Erro na alteração de quantidade do produto');
     }
   };
 
