@@ -12,10 +12,10 @@ a duas páginas, um componente e um hook para implementar as seguintes funcional
 
 ### 📸 Screenshots
 #### home
-<img src="" />
+<img src="https://github.com/jose-rgb/ecommerce-rocktshoes/blob/master/.github/home.png" />
 
 #### Card 
-<img src="" />
+<img src="https://github.com/jose-rgb/ecommerce-rocktshoes/blob/master/.github/card.png" />
 
 ## ⏯ Como usar 
 ### 🖥⚙️ Dependências 
